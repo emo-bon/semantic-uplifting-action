@@ -48,7 +48,7 @@ jobs:
         force-branch: true
           
   release-manager:
-    needs: test_build 
+    needs: build 
     name: Check if ready for release
     runs-on: ubuntu-latest
     env:
