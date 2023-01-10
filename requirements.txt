@@ -1,0 +1,2 @@
+pysubyt
+git+https://github.com/vliz-be-opsci/pysubyt@f90a9b1#egg=pysubyt
