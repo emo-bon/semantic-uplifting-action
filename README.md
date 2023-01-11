@@ -20,7 +20,7 @@ jobs:
       # Checkout this repo
       - uses: actions/checkout@v3 
 
-      # New html to pages 
+      # Semantic Uplifting of files
       - name: Semantic Uplifting
         uses: vliz-be-opsci/ROCrate_Semantic_Uplifting_By_PYSUBYT@latest
 ```
