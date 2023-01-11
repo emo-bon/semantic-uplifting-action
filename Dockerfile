@@ -16,4 +16,6 @@ COPY entrypoint.py /entrypoint.py
 RUN chmod +x /entrypoint.py
 COPY requirements.txt /requirements.txt
 RUN pip install -r requirements.txt
+#ECHO all files in the current directory
+RUN ls -la
 ENTRYPOINT ["/entrypoint.py"]
