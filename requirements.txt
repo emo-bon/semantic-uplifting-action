@@ -1,2 +1,3 @@
 #pysubyt
 git+https://github.com/vliz-be-opsci/pysubyt#egg=pysubyt
+github
