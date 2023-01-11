@@ -20,10 +20,6 @@ jobs:
       # Checkout this repo
       - uses: actions/checkout@v3 
 
-      # Build the preview.html file from the rocrate.json
-      #- name: Build Preview HTML
-      #  uses: vliz-be-opsci/rocrate-to-pages@latest #vliz-be-opsci/new_rocrate_to_pages@latest
-
       # New html to pages 
       - name: Semantic Uplifting
         uses: vliz-be-opsci/ROCrate_Semantic_Uplifting_By_PYSUBYT@latest
