@@ -13,8 +13,8 @@ def main():
     git_repo = os.getenv("GITHUB_REPOSITORY")
 
     # Print the token
-    print("GitHub access token: " + git_access_token)
-    print("GitHub repository: " + git_repo)
+    print("GitHub access token: " + str(git_access_token))
+    print("GitHub repository: " + str(git_repo))
     print("End of script.")
 
 if __name__ == "__main__":
