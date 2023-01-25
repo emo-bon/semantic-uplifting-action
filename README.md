@@ -22,5 +22,5 @@ jobs:
 
       # Semantic Uplifting of files
       - name: Semantic Uplifting
-        uses: vliz-be-opsci/ROCrate_Semantic_Uplifting_By_PYSUBYT@latest
+        uses: vliz-be-opsci/Semantify@latest
 ```
