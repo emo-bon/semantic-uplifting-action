@@ -1,6 +1,8 @@
-# ROCrate_Semantic_Uplifting_By_PYSUBYT
+# semantify
 
-[![On_Push_build](https://github.com/vliz-be-opsci/ROCrate_Semantic_Uplifting_By_PYSUBYT/actions/workflows/build.yml/badge.svg)](https://github.com/vliz-be-opsci/ROCrate_Semantic_Uplifting_By_PYSUBYT/actions/workflows/build.yml)
+[![On_Push_build](https://github.com/vliz-be-opsci/semantify/actions/workflows/build.yml/badge.svg)](https://github.com/vliz-be-opsci/semantify/actions/workflows/build.yml)
+
+`semantify` is a GitHub action that makes use of `pysembench` to semantically uplift your data.
 
 ## How to use ##
 
@@ -22,5 +24,5 @@ jobs:
 
       # Semantic Uplifting of files
       - name: Semantic Uplifting
-        uses: vliz-be-opsci/Semantify@latest
+        uses: vliz-be-opsci/semantify@latest
 ```
