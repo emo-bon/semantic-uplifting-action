@@ -1,4 +1,1 @@
-#pysubyt
-git+https://github.com/vliz-be-opsci/pysubyt#egg=pysubyt
-pytest
-python-dotenv
+git+https://github.com/vliz-be-opsci/pysembench.git@main
