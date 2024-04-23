@@ -13,7 +13,6 @@ if __name__ == "__main__":
         input_data_location = kwargs["INPUT_DATA_LOCATION"],
         sembench_data_location = kwargs["SEMBENCH_DATA_LOCATION"],
         sembench_config_path = kwargs["SEMBENCH_CONFIG_PATH"],
-        force=True,
     )
 
     sb.process()
