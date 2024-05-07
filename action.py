@@ -16,7 +16,7 @@ if __name__ == "__main__":
         locations=dict(
             home=kwargs["SEMBENCH_DATA_LOCATION"],
             input=kwargs["INPUT_DATA_LOCATION"],
-        )
+        ),
         sembench_config_path = kwargs["SEMBENCH_CONFIG_PATH"],
     )
 
