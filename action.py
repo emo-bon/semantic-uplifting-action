@@ -15,6 +15,7 @@ if __name__ == "__main__":
             "input": kwargs["INPUT_DATA_LOCATION"],
         },
         sembench_config_path = kwargs["SEMBENCH_CONFIG_PATH"],
+        fail_fast=True,
     )
 
     sb.process()
