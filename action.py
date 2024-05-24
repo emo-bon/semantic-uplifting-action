@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from pysembench.core import Sembench
+from pysembench import Sembench
 
 if __name__ == "__main__":
     GITHUB_WORKSPACE = Path("/github/workspace")
@@ -10,8 +10,10 @@ if __name__ == "__main__":
         kwargs = json.load(f)
 
     sb = Sembench(
-        input_data_location = kwargs["INPUT_DATA_LOCATION"],
-        sembench_data_location = kwargs["SEMBENCH_DATA_LOCATION"],
+        locations={
+            "home": kwargs["SEMBENCH_DATA_LOCATION"],
+            "input": kwargs["INPUT_DATA_LOCATION"],
+        },
         sembench_config_path = kwargs["SEMBENCH_CONFIG_PATH"],
     )
 
