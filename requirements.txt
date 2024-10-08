@@ -1,2 +1,2 @@
 pyyaml
-git+https://github.com/vliz-be-opsci/pysembench.git@main
+git+https://github.com/vliz-be-opsci/py-sema.git@main

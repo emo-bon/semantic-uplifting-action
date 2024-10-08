@@ -1,7 +1,7 @@
 import json
 import yaml
 from pathlib import Path
-from pysembench import Sembench
+from sema.bench import Sembench
 
 GITHUB_WORKSPACE = Path("/github/workspace")
 SEMBENCH_KWARGS = Path("~sembench_kwargs.json")
