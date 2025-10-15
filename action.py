@@ -11,7 +11,6 @@ from pathlib import Path
 from sema.bench import Sembench
 
 GITHUB_WORKSPACE = Path("/github/workspace")
-SEMBENCH_KWARGS = Path("~sembench_kwargs.json")
 SEMBENCH_WORKSPACE = GITHUB_WORKSPACE / "~sembench_data_cache"
 PROFILE = os.getenv("PROFILE")
 
@@ -52,7 +51,7 @@ def clone_profile_crate_repo():
 def splice_sembench_config(ignore_task_prefix):
     """This function is a hack to circumvent the problem that a YAML file can't be parsed without resolving the !tags.
     """
-    with open(SEMBENCH_CONFIG_PATH, "r") as f:
+    with open(SEMBENCH_WORKSPACE / "sembench.yaml", "r") as f:
         config = f.readlines()
 
     spliced_config = []
@@ -68,7 +67,7 @@ def splice_sembench_config(ignore_task_prefix):
             skipping = False
             spliced_config.append(line)
 
-    with open(SEMBENCH_CONFIG_PATH, "w") as f:
+    with open(SEMBENCH_WORKSPACE / "sembench.yaml", "w") as f:
         f.writelines(spliced_config)
 
 if __name__ == "__main__":
@@ -77,24 +76,7 @@ if __name__ == "__main__":
 
     if not SEMBENCH_WORKSPACE.exists(): 
         SEMBENCH_WORKSPACE.mkdir(parents=True, exist_ok=True)
-
-    clone_profile_crate_repo()
-
-    sembench_kwargs = {
-        "INPUT_DATA_LOCATION": str(GITHUB_WORKSPACE),
-        "SEMBENCH_DATA_LOCATION": str(SEMBENCH_WORKSPACE),
-        "SEMBENCH_CONFIG_PATH": str(SEMBENCH_WORKSPACE / "sembench.yaml"),  # TODO read from profile metadata
-    }
-
-    with open(GITHUB_WORKSPACE / "~sembench_kwargs.json", "w") as f:
-        json.dump(sembench_kwargs, f)
-
-    with open(GITHUB_WORKSPACE / SEMBENCH_KWARGS) as f:
-        kwargs = json.load(f)
-
-    INPUT_DATA_LOCATION = kwargs["INPUT_DATA_LOCATION"]
-    SEMBENCH_DATA_LOCATION = kwargs["SEMBENCH_DATA_LOCATION"]
-    SEMBENCH_CONFIG_PATH = kwargs["SEMBENCH_CONFIG_PATH"]
+        clone_profile_crate_repo()
 
     wp = yaml.load(open(GITHUB_WORKSPACE / "config/workflow_properties.yml"), Loader=yaml.BaseLoader)
 
@@ -105,10 +87,10 @@ if __name__ == "__main__":
 
     sb = Sembench(
         locations={
-            "home": SEMBENCH_DATA_LOCATION,
-            "input": INPUT_DATA_LOCATION,
+            "home": str(SEMBENCH_WORKSPACE),
+            "input": str(GITHUB_WORKSPACE),
         },
-        sembench_config_path = SEMBENCH_CONFIG_PATH,
+        sembench_config_path = str(SEMBENCH_WORKSPACE / "sembench.yaml"),
         fail_fast=True,
     )
 
