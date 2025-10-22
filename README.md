@@ -32,7 +32,11 @@ Contents of this package include:
 - Utilities for reading input data and writing output triples
 - Interfaces for working with templating rules, transformation logic, and output formats
 
-This package is typically used within the context of *-profile repositories that define specific semantic uplifting configurations and templates.
+This package is typically used within the context of `./*-profile` repositories that define specific semantic uplifting configurations and templates, such as for example:    
+- [observatory profile](https://github.com/emo-bon/observatory-profile)
+- [analysis results profile](https://github.com/emo-bon/analysis-results-profile)
+- [sequencing profile](https://github.com/emo-bon/sequencing-profile)
+
 
 ## Configuration
 
@@ -46,10 +50,11 @@ Specifies the main configuration for the uplifting action, which includes:
 - Template population settings, such as iteration rules and transformation parameters
 - Additional environment variables that affect the behavior of the uplifting process
 
-This file can be found either locally or within *-profile repositories, making it easy to adapt the workflow to specific data domains or projects.
+This file can be found either locally or within `./*-profile` repositories, making it easy to adapt the workflow to specific data domains or projects.
 
 **Templates:**  
 Semantic uplifting templates are typically stored in the `./templates` folder of `./*-profile` repositories. These templates define how to map raw data values into structured RDF triples, using domain-specific ontologies or models.
 
 **Input Data:**  
 Input data files (i.e. transformed logsheets) are usually located in the `/logsheets/transformed/` directory of the relevant `./observatory-*-crate` repositories. These files represent cleaned and pre-processed data, ready for semantic transformation.
+
