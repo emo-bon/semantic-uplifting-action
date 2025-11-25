@@ -1,6 +1,7 @@
 FROM python:3.10
-COPY action.py /action.py
-COPY entrypoint.sh /entrypoint.sh
-COPY requirements.txt /requirements.txt
-RUN python -m pip install -r /requirements.txt
-ENTRYPOINT ["/entrypoint.sh"]
+COPY entrypoint.sh /opt/entrypoint.sh
+COPY action /opt/action
+COPY requirements.txt /opt/requirements.txt
+RUN chmod +x /opt/entrypoint.sh
+RUN python -m pip install -r /opt/requirements.txt
+ENTRYPOINT ["/opt/entrypoint.sh"]

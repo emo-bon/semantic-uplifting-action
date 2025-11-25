@@ -1,2 +1,2 @@
-#!/bin/sh
-python /action.py
+#!/bin/bash
+PYTHONPATH=/opt python -m action

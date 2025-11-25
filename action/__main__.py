@@ -1,14 +1,21 @@
+import argparse
 import glob
 import os
-import shutil
-import zipfile
 import requests
+import shutil
+import yaml
+import zipfile
+from dotenv import load_dotenv
 from pathlib import Path
 from rocrate.rocrate import ROCrate, ContextEntity
-import json
-import yaml
-from pathlib import Path
 from sema.bench import Sembench
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--dev', action='store_true')
+args = parser.parse_args()
+
+if args.dev:
+    load_dotenv(override=True)
 
 GITHUB_WORKSPACE = Path("/github/workspace")
 SEMBENCH_WORKSPACE = GITHUB_WORKSPACE / "~sembench_data_cache"

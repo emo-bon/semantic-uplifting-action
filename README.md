@@ -1,4 +1,4 @@
-# semantify
+# semantic-uplifting-action
 
 ## Usage 
 
