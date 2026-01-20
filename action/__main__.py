@@ -81,7 +81,7 @@ if __name__ == "__main__":
                     "observatory-profile": str(SEMA_WORKSPACE),
                     "observatory-crate": str(GITHUB_WORKSPACE),
                 },
-                sembench_config_path = str(SEMA_WORKSPACE / f"sema_{habitat}.yaml"),
+                sembench_config_path = str(SEMA_WORKSPACE / f"sema_bench_{habitat}.yaml"),
                 fail_fast=True,
             )
 
