@@ -28,39 +28,40 @@ HARD_LOGSHEET_URL = os.getenv("HARD_LOGSHEET_URL")
 RDF_AGGREGATOR_GLOB = os.getenv("RDF_AGGREGATOR_GLOB")
 
 
-def clone_profile_crate_repo():
-    profile_crate_metadata = requests.get(f"{ROCRATE_PROFILE_URI}/ro-crate-metadata.json").json()
-    download_url = None
-    for node in profile_crate_metadata.get("@graph", [{}]):
-        if node.get("@id", "") == "./":
-            download_url = node.get("downloadUrl")
-    assert download_url
-    zipball = requests.get(download_url)
-    with open(SEMA_WORKSPACE / "zipball.zip", "wb") as f:
-        f.write(zipball.content)
-    with zipfile.ZipFile(SEMA_WORKSPACE / "zipball.zip", 'r') as f:
-        f.extractall(SEMA_WORKSPACE / "zipball")
-    for path in glob.glob(str(SEMA_WORKSPACE / "zipball" / "*" / "*")):
-        shutil.move(path, SEMA_WORKSPACE)
-    os.remove(SEMA_WORKSPACE / "zipball.zip")
-    shutil.rmtree(SEMA_WORKSPACE / "zipball")
+# TODO: use py-sema: sema-ro-get
+# def clone_profile_crate_repo():
+#     profile_crate_metadata = requests.get(f"{ROCRATE_PROFILE_URI}/ro-crate-metadata.json").json()
+#     download_url = None
+#     for node in profile_crate_metadata.get("@graph", [{}]):
+#         if node.get("@id", "") == "./":
+#             download_url = node.get("downloadUrl")
+#     assert download_url
+#     zipball = requests.get(download_url)
+#     with open(SEMA_WORKSPACE / "zipball.zip", "wb") as f:
+#         f.write(zipball.content)
+#     with zipfile.ZipFile(SEMA_WORKSPACE / "zipball.zip", 'r') as f:
+#         f.extractall(SEMA_WORKSPACE / "zipball")
+#     for path in glob.glob(str(SEMA_WORKSPACE / "zipball" / "*" / "*")):
+#         shutil.move(path, SEMA_WORKSPACE)
+#     os.remove(SEMA_WORKSPACE / "zipball.zip")
+#     shutil.rmtree(SEMA_WORKSPACE / "zipball")
 
+# TODO: use py-sema: sema-aggregate
+# class Aggregator:
+#     def __init__(self):
+#         self.globs = {k.strip(): v.strip() for k, v in (i.strip().split(":") for i in RDF_AGGREGATOR_GLOB.split(","))}
+#         self.graph = Graph()
 
-class Aggregator:
-    def __init__(self):
-        self.globs = {k.strip(): v.strip() for k, v in (i.strip().split(":") for i in RDF_AGGREGATOR_GLOB.split(","))}
-        self.graph = Graph()
+#     def aggregate(self):
+#         for glb, fmt in self.globs.items():
+#             for p in GITHUB_WORKSPACE.rglob(glb):
+#                 if p.is_file():
+#                     try:
+#                         self.graph.parse(p, format=fmt)
+#                     except Exception as e:
+#                         print(f"failed to parse {p}: {e}")
 
-    def aggregate(self):
-        for glb, fmt in self.globs.items():
-            for p in GITHUB_WORKSPACE.rglob(glb):
-                if p.is_file():
-                    try:
-                        self.graph.parse(p, format=fmt)
-                    except Exception as e:
-                        print(f"failed to parse {p}: {e}")
-
-        self.graph.serialize(GITHUB_WORKSPACE / "all-triples.ttl", format="ttl")
+#         self.graph.serialize(GITHUB_WORKSPACE / "all-triples.ttl", format="ttl")
 
 
 if __name__ == "__main__":
