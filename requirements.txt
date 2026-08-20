@@ -1,4 +1,3 @@
 requests
-rocrate
 python-dotenv
 git+https://github.com/vliz-be-opsci/py-sema.git

@@ -3,9 +3,9 @@ import logging
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-from rocrate.rocrate import ROCrate
 from sema.bench import Sembench
 from sema.commons.aggregator import Aggregator
+from sema.ro.creator import ROCreator
 from sema.ro.getter import ROGetter
 
 logging.basicConfig(
@@ -31,6 +31,7 @@ SEDIMENT_LOGSHEET_URL = os.getenv("SEDIMENT_LOGSHEET_URL")
 HARD_LOGSHEET_URL = os.getenv("HARD_LOGSHEET_URL")
 RDF_AGGREGATOR_GLOB = os.getenv("RDF_AGGREGATOR_GLOB")
 RDF_AGGREGATOR_OUTPUT = os.getenv("RDF_AGGREGATOR_OUTPUT")
+ROCRATE_BLUEPRINT_PATH = os.getenv("ROCRATE_BLUEPRINT_PATH")
 
 
 def parse_aggregator_globs(glob_str: str | None) -> list[str | dict[str, str]]:
@@ -53,11 +54,6 @@ def parse_aggregator_globs(glob_str: str | None) -> list[str | dict[str, str]]:
 
 
 if __name__ == "__main__":
-    if not (GITHUB_WORKSPACE / "ro-crate-metadata.json").exists():
-        logger.info("Initializing ROCrate metadata in %s...", GITHUB_WORKSPACE)
-        crate = ROCrate()
-        crate.write(GITHUB_WORKSPACE)
-
     if not SEMA_WORKSPACE.exists():
         SEMA_WORKSPACE.mkdir(parents=True, exist_ok=True)
 
@@ -100,3 +96,31 @@ if __name__ == "__main__":
         output_format="text/turtle",
     ).process()
     logger.info("Aggregation completed successfully.")
+
+    # TODO disuss whether this should be a sema-bench action
+    # Generate ro-crate-metadata.json using ROCreator
+    blueprint_path = None
+    if ROCRATE_BLUEPRINT_PATH:
+        blueprint_path = Path(ROCRATE_BLUEPRINT_PATH)
+    elif (SEMA_WORKSPACE / "sema_roc.yaml").exists():
+        blueprint_path = SEMA_WORKSPACE / "sema_roc.yaml"
+    elif (SEMA_WORKSPACE / "roc-me.yml").exists():
+        blueprint_path = SEMA_WORKSPACE / "roc-me.yml"
+
+    if blueprint_path and blueprint_path.exists():
+        repo_name = (
+            os.getenv("REPO_NAME")
+            or (os.getenv("GITHUB_REPOSITORY", "").split("/")[-1] if os.getenv("GITHUB_REPOSITORY") else None)
+            or GITHUB_WORKSPACE.resolve().name
+        )
+        blueprint_env = {"REPO_NAME": repo_name, **os.environ}
+        logger.info("Generating RO-Crate metadata using blueprint %s for %s...", blueprint_path, repo_name)
+        ROCreator(
+            blueprint_path=blueprint_path,
+            blueprint_env=blueprint_env,
+            rocrate_path=GITHUB_WORKSPACE,
+            force=True,
+        ).process()
+        logger.info("RO-Crate metadata generated successfully.")
+    else:
+        logger.warning("No RO-Crate blueprint found in %s; skipping ROCreator.", SEMA_WORKSPACE)
