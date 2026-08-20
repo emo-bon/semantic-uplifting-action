@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import tempfile
 from dotenv import load_dotenv
 from pathlib import Path
 from sema.bench import Sembench
@@ -25,9 +24,7 @@ if args.dev:
 
 
 GITHUB_WORKSPACE = Path(os.getenv("GITHUB_WORKSPACE", "."))
-SEMA_WORKSPACE = Path(
-    os.getenv("SEMA_WORKSPACE", Path(tempfile.gettempdir()) / "sema-workspace")
-)
+SEMA_WORKSPACE = GITHUB_WORKSPACE / "sema-workspace"
 ROCRATE_PROFILE_URI = os.getenv("ROCRATE_PROFILE_URI")
 WATER_LOGSHEET_URL = os.getenv("WATER_LOGSHEET_URL")
 SEDIMENT_LOGSHEET_URL = os.getenv("SEDIMENT_LOGSHEET_URL")
