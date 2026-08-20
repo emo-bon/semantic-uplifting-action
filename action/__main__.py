@@ -72,16 +72,23 @@ if __name__ == "__main__":
         if habitat == "common" or (os.getenv(f"{habitat.upper()}_LOGSHEET_URL")):
             config_path = SEMA_WORKSPACE / f"sema_bench_{habitat}.yaml"
             logger.info("Running Sembench for %s (%s)...", habitat, config_path)
-            sb = Sembench(
-                locations={
-                    "observatory-profile": str(SEMA_WORKSPACE),
-                    "observatory-crate": str(GITHUB_WORKSPACE),
-                },
-                sembench_config_path=str(config_path),
-                fail_fast=True,
-            )
+            # tmp try accept here to circumvent hard samples issue where
+            # hard samples are currently not implememented but planned to be 
+            # TODO remove try-accept when issue hard samples solved
 
-            sb.process()
+            try:
+                sb = Sembench(
+                    locations={
+                        "observatory-profile": str(SEMA_WORKSPACE),
+                        "observatory-crate": str(GITHUB_WORKSPACE),
+                    },
+                    sembench_config_path=str(config_path),
+                    fail_fast=True,
+                )
+                sb.process()
+            except Exception as e:
+                logger.error("Failed to process %s samples: %s", habitat, e)
+                # raise e # TODO remove this line when issue hard samples solved
 
     globs = parse_aggregator_globs(RDF_AGGREGATOR_GLOB)
     output_path = GITHUB_WORKSPACE / (RDF_AGGREGATOR_OUTPUT or "all-triples.ttl")
