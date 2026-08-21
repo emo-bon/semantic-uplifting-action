@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import shutil
 from dotenv import load_dotenv
 from pathlib import Path
 from sema.bench import Sembench
@@ -32,6 +33,7 @@ HARD_LOGSHEET_URL = os.getenv("HARD_LOGSHEET_URL")
 RDF_AGGREGATOR_GLOB = os.getenv("RDF_AGGREGATOR_GLOB")
 RDF_AGGREGATOR_OUTPUT = os.getenv("RDF_AGGREGATOR_OUTPUT")
 ROCRATE_BLUEPRINT_PATH = os.getenv("ROCRATE_BLUEPRINT_PATH")
+BLUECLOUD_BLUEPRINT_PATH = os.getenv("BLUECLOUD_BLUEPRINT_PATH")
 
 
 def parse_aggregator_globs(glob_str: str | None) -> list[str | dict[str, str]]:
@@ -68,10 +70,6 @@ if __name__ == "__main__":
         if habitat == "common" or (os.getenv(f"{habitat.upper()}_LOGSHEET_URL")):
             config_path = SEMA_WORKSPACE / f"sema_bench_{habitat}.yaml"
             logger.info("Running Sembench for %s (%s)...", habitat, config_path)
-            # tmp try accept here to circumvent hard samples issue where
-            # hard samples are currently not implememented but planned to be 
-            # TODO remove try-accept when issue hard samples solved
-
             try:
                 sb = Sembench(
                     locations={
@@ -84,8 +82,8 @@ if __name__ == "__main__":
                 sb.process()
             except Exception as e:
                 logger.error("Failed to process %s samples: %s", habitat, e)
-                # raise e # TODO remove this line when issue hard samples solved
 
+    # Aggregate RDF triples
     globs = parse_aggregator_globs(RDF_AGGREGATOR_GLOB)
     output_path = GITHUB_WORKSPACE / (RDF_AGGREGATOR_OUTPUT or "all-triples.ttl")
     logger.info("Aggregating RDF triples matching %s into %s...", globs, output_path)
@@ -97,8 +95,49 @@ if __name__ == "__main__":
     ).process()
     logger.info("Aggregation completed successfully.")
 
-    # TODO disuss whether this should be a sema-bench action
-    # Generate ro-crate-metadata.json using ROCreator
+    # Shared blueprint environment
+    repo_name = (
+        os.getenv("REPO_NAME")
+        or (os.getenv("GITHUB_REPOSITORY", "").split("/")[-1] if os.getenv("GITHUB_REPOSITORY") else None)
+        or GITHUB_WORKSPACE.resolve().name
+    )
+    blueprint_env = {
+        "REPO_NAME": repo_name,
+        **os.environ,
+        "observatory-profile": str(SEMA_WORKSPACE),
+        "observatory-crate": str(GITHUB_WORKSPACE),
+    }
+
+    # 1. Generate Standalone Blue-Cloud Metadata using sema_bc.yaml
+    bc_blueprint = None
+    if BLUECLOUD_BLUEPRINT_PATH:
+        bc_blueprint = Path(BLUECLOUD_BLUEPRINT_PATH)
+    elif (SEMA_WORKSPACE / "sema_bc.yaml").exists():
+        bc_blueprint = SEMA_WORKSPACE / "sema_bc.yaml"
+
+    if bc_blueprint and bc_blueprint.exists():
+        logger.info("Generating Blue-Cloud metadata using blueprint %s...", bc_blueprint)
+        bc_temp_dir = GITHUB_WORKSPACE / ".bc_temp"
+        bc_temp_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            # Ensure all-triples.ttl is available in working directory for Reasoner
+            if (GITHUB_WORKSPACE / "all-triples.ttl").exists():
+                shutil.copy(GITHUB_WORKSPACE / "all-triples.ttl", bc_temp_dir / "all-triples.ttl")
+
+            ROCreator(
+                blueprint_path=bc_blueprint,
+                blueprint_env=blueprint_env,
+                rocrate_path=bc_temp_dir,
+                force=True,
+            ).process()
+
+            target_bc_file = GITHUB_WORKSPACE / "bluecloud-metadata.json"
+            shutil.copy(bc_temp_dir / "ro-crate-metadata.json", target_bc_file)
+            logger.info("Blue-Cloud metadata generated successfully at %s", target_bc_file)
+        finally:
+            shutil.rmtree(bc_temp_dir, ignore_errors=True)
+
+    # 2. Generate Repository ro-crate-metadata.json using ROCreator
     blueprint_path = None
     if ROCRATE_BLUEPRINT_PATH:
         blueprint_path = Path(ROCRATE_BLUEPRINT_PATH)
@@ -108,16 +147,6 @@ if __name__ == "__main__":
         blueprint_path = SEMA_WORKSPACE / "roc-me.yml"
 
     if blueprint_path and blueprint_path.exists():
-        repo_name = (
-            os.getenv("REPO_NAME")
-            or (os.getenv("GITHUB_REPOSITORY", "").split("/")[-1] if os.getenv("GITHUB_REPOSITORY") else None)
-            or GITHUB_WORKSPACE.resolve().name
-        )
-        blueprint_env = {
-            "REPO_NAME": repo_name, **os.environ,
-            "observatory-profile": str(SEMA_WORKSPACE),
-            "observatory-crate": str(GITHUB_WORKSPACE)
-        }
         logger.info("Generating RO-Crate metadata using blueprint %s for %s...", blueprint_path, repo_name)
         ROCreator(
             blueprint_path=blueprint_path,
