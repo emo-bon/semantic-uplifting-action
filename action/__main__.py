@@ -113,7 +113,11 @@ if __name__ == "__main__":
             or (os.getenv("GITHUB_REPOSITORY", "").split("/")[-1] if os.getenv("GITHUB_REPOSITORY") else None)
             or GITHUB_WORKSPACE.resolve().name
         )
-        blueprint_env = {"REPO_NAME": repo_name, **os.environ}
+        blueprint_env = {
+            "REPO_NAME": repo_name, **os.environ,
+            "observatory-profile": str(SEMA_WORKSPACE),
+            "observatory-crate": str(GITHUB_WORKSPACE)
+        }
         logger.info("Generating RO-Crate metadata using blueprint %s for %s...", blueprint_path, repo_name)
         ROCreator(
             blueprint_path=blueprint_path,
